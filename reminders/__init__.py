@@ -3,36 +3,37 @@ This module implements reminder system\
 Этот модуль реализовывает систему напоминаний.
 """
 import sqlite3
-import time
-import os
+from time import localtime
+from time import time
 class run:
     def __init__(self, path, ctx=False):
         """
         Connects to the database\n
         Подключается к базе данных
         """
-        if not ctx:
-            self.con = sqlite3.connect(path)
-            self.cur = self.con.cursor()
-            request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name, date, text, date_until)"
-            self.cur.execute(request)
+        self.con = sqlite3.connect(path)
+        self.cur = self.con.cursor()
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time TEXT)"
+        self.cur.execute(request)
     def __enter__(self):
         self.con = sqlite3.connect("dbs/tasks.db")
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name, date, text, date_until)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time TEXT)"
         self.cur.execute(request)
         return (self.con, self.cur)
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
         if exc_val:
             raise
-    def create_a_task(self, date_exec, text_exec, name=None, date_until=None):
+    def create_a_task(self, date_exec, text_exec, date_until, time, name=None):
         """
         Creates a task.\n
         Создаёт напоминание.
         """
-        request = "INSERT INTO total_tasks(date, text) VALUES(?, ?, ?, ?)"
-        self.cur.execute(request, (name, date_exec, text_exec, date_until))
+        if not name:
+            name = "notnamed"
+        request = "INSERT INTO total_tasks(name, date, text, date_until, time) VALUES(?, ?, ?, ?, ?)"
+        self.cur.execute(request, (name, date_exec, text_exec, date_until, time))
         self.con.commit()
     def delete_the_task(self, task_id):
         """
@@ -76,7 +77,7 @@ class run:
         """
         request = "DROP TABLE IF EXISTS total_tasks"
         self.cur.execute(request)
-        request = "CREATE TABLE total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name, date, text, date_until)"
+        request = "CREATE TABLE total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time INT)"
         self.cur.execute(request)
     def con_exit(self):
         """
@@ -95,7 +96,7 @@ class run:
         Returns today as date\n
         Возвращает дату сегодняшнего дня.
         """
-        date = f"{time.localtime(time.time()).tm_year}-{time.localtime(time.time()).tm_mon}-{time.localtime(time.time()).tm_mday}"
+        date = f"{localtime(time()).tm_year}-{localtime(time()).tm_mon}-{localtime(time()).tm_mday}"
         return date
     def show_today(self):
         """
@@ -110,8 +111,8 @@ class run:
         Печатает напоминания на сегодня.
         """
         for i in self.show_today():
-            print(f"{i[1]} from {i[2]} to {i[4]}: {i[3]}")
-            print(f"{i[1]} с {i[2]} до {i[4]}: {i[3]}")
+            print(f"id{i[0]}  {i[1]} from {i[2]} to {i[4]}.{i[5]}: {i[3]}")
+            print(f"id{i[0]}  {i[1]} с {i[2]} до {i[4]}.{i[5]}: {i[3]}")
     def reminder_on_date(self, date):
         """
         Prints date's reminders\n
@@ -119,26 +120,28 @@ class run:
         """
         try:
             for i in self.show_on_date(date):
-                print(f"{i[1]} from {i[2]} to {i[4]}: {i[3]}")
-                print(f"{i[1]} с {i[2]} до {i[4]}: {i[3]}")
+                print(f"id{i[0]} {i[1]} from {i[2]} to {i[4]}.{i[5]}: {i[3]}")
+                print(f"id{i[0]} {i[1]} с {i[2]} до {i[4]}.{i[5]}: {i[3]}")
         except Exception as err:
             print(err)
-    def reminder_all(self, date):
+    def reminder_all(self):
         """
         Prints all reminders\n
         Печатает все напоминания.
         """
         try:
-            for i in self.read_all(date):
-                print(f"{i[1]} from {i[2]} to {i[4]}: {i[3]}")
-                print(f"{i[1]} с {i[2]} до {i[4]}: {i[3]}")
+            for i in self.read_all():
+                print(f"id{i[0]} {i[1]} from {i[2]} to {i[4]}.{i[5]}: {i[3]}")
+                print(f"id{i[0]} {i[1]} с {i[2]} до {i[4]}.{i[5]}: {i[3]}")
         except Exception as err:
             print(err)
-    def update(self, date_until, text, task_id, name=None):
+    def update(self, date_until, text, task_id, time, name=None):
         """
         Updates reminder\n
         Обновление напоминания
         """
-        request = "UDPATE total_tasks SET date_until=?, text=?, name=? WHERE id=?"
-        self.cur.execute(request, (date_until, text, name, task_id))
+        if not name:
+            name = "notnamed"
+        request = "UPDATE total_tasks SET date_until=?, text=?, name=? time=? WHERE id=?"
+        self.cur.execute(request, (date_until, text, name, time, task_id))
         self.con.commit()
