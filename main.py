@@ -97,54 +97,78 @@ class Window(QWidget):
         
         
         #====================
-        self.btns1 = []
-        self.btns2 = []
-        self.btns3 = []
-        self.layouts = []
-        self.done_layouts = []
-        self.lines = []
-        self.dates = []
-        self.texts = []
+
+        self.layouts = {}
+        self.layouts1 = {}
+        self.x_pos = 0
+        self.y_pos = 0
 
         self.show()
 
     def save(self):
-        # твой код
+        #твой код
         pass
 
     def edit(self):
-        # твой код
+        #твой код
         pass
         
     def delete(self):
-        # твой код
-        pass
+        self.widget = self.sender()
+        self.key_list = list(self.layouts1.keys())
+        self.val_list = list(self.layouts1.values())
+        self.position = self.val_list.index(self.widget)
+        self.item = self.key_list[self.position]
+
+        for i in self.layouts[self.item]:
+            i.deleteLater()
+            if self.layouts[self.task] == None:
+                break
+        
+        self.y_pos -= 1
+
         
         
     def createTask(self):
-        global row
-        self.layouts.append(QGridLayout())
-        self.lines.append(QLineEdit(self))
-        self.dates.append(QDateEdit(self))
-        self.texts.append(QTextEdit(self))
-        self.btns1.append(QPushButton("Изменить", self))
-        self.btns2.append(QPushButton("Удалить", self))
-        self.btns3.append(QPushButton("Сохранить", self))
+        self.y_pos = self.y_pos + 1
 
-        self.btns1[self.row].clicked.connect(self.edit)
-        self.btns2[self.row].clicked.connect(self.delete)
-        self.btns3[self.row].clicked.connect(self.save)
-        
-        self.layouts[self.row].addWidget(self.lines[self.row], 0, 0)
-        self.layouts[self.row].addWidget(self.dates[self.row], 0, 1)
-        self.layouts[self.row].addWidget(self.texts[self.row], 0, 2)
-        self.layouts[self.row].addWidget(self.btns1[self.row], 0, 3)
-        self.layouts[self.row].addWidget(self.btns2[self.row], 0, 4)
-        self.layouts[self.row].addWidget(self.btns3[self.row], 0, 5)
+        self.elem = []
 
-        self.tasks.addLayout(self.layouts[self.row], self.row, 0)
+        self.task = QGridLayout()
+
+        self.line = QLineEdit(self)
+        self.date = QDateEdit(self)
+        self.text = QTextEdit(self)
+        self.label = QLabel(f"{self.y_pos}")
+        self.button = QPushButton(f"Delete")
+        self.button1 = QPushButton(f"Save")
+        self.button2 = QPushButton(f"Edit")
+
+        self.elem.append(self.button)
+        self.elem.append(self.label)
+        self.elem.append(self.button1)
+        self.elem.append(self.button2)
+        self.elem.append(self.line)
+        self.elem.append(self.date)
+        self.elem.append(self.text)
+
+        self.task.addWidget(self.label, self.y_pos, 0)
+        self.task.addWidget(self.line, self.y_pos, 1)
+        self.task.addWidget(self.date, self.y_pos, 2)
+        self.task.addWidget(self.text, self.y_pos, 3)
+        self.task.addWidget(self.button2, self.y_pos, 4)
+        self.task.addWidget(self.button1, self.y_pos, 5)
+        self.task.addWidget(self.button, self.y_pos, 6)
+
+        self.button2.clicked.connect(self.edit)
+        self.button.clicked.connect(self.delete)
+        self.button1.clicked.connect(self.save)
+
+        self.layouts[self.task] = self.elem
+        self.layouts1[self.task] = self.button
+
+        self.tasks.addLayout(self.task, self.y_pos, 0)
         
-        self.row += 1
         
           
 if __name__ == '__main__':
@@ -152,3 +176,6 @@ if __name__ == '__main__':
     window = Window()
     App.setStyle('Fusion')
     sys.exit(App.exec())
+
+
+
