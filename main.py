@@ -100,18 +100,34 @@ class Window(QWidget):
 
         self.layouts = {}
         self.layouts1 = {}
+        self.layouts2 = {}
+        self.layouts3 = {}
         self.x_pos = 0
         self.y_pos = 0
 
         self.show()
 
     def save(self):
-        #твой код
-        pass
+        self.widget = self.sender()
+        self.key_list = list(self.layouts2.keys())
+        self.val_list = list(self.layouts2.values())
+        self.position = self.val_list.index(self.widget)
+        self.item = self.key_list[self.position]
+        
+        self.layouts[self.item][1].setReadOnly(True)
+        self.layouts[self.item][2].setReadOnly(True)
+        self.layouts[self.item][3].setReadOnly(True)
 
     def edit(self):
-        #твой код
-        pass
+        self.widget = self.sender()
+        self.key_list = list(self.layouts3.keys())
+        self.val_list = list(self.layouts3.values())
+        self.position = self.val_list.index(self.widget)
+        self.item = self.key_list[self.position]
+        
+        self.layouts[self.item][1].setReadOnly(False)
+        self.layouts[self.item][2].setReadOnly(False)
+        self.layouts[self.item][3].setReadOnly(False)
         
     def delete(self):
         self.widget = self.sender()
@@ -135,22 +151,21 @@ class Window(QWidget):
         self.elem = []
 
         self.task = QGridLayout()
-
-        self.line = QLineEdit(self)
-        self.date = QDateEdit(self)
-        self.text = QTextEdit(self)
         self.label = QLabel(f"{self.y_pos}")
+        self.line = QLineEdit()
+        self.date = QDateEdit()
+        self.text = QTextEdit()
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
         self.button2 = QPushButton(f"Edit")
 
-        self.elem.append(self.button)
         self.elem.append(self.label)
-        self.elem.append(self.button1)
-        self.elem.append(self.button2)
         self.elem.append(self.line)
         self.elem.append(self.date)
         self.elem.append(self.text)
+        self.elem.append(self.button)
+        self.elem.append(self.button1)
+        self.elem.append(self.button2)
 
         self.task.addWidget(self.label, self.y_pos, 0)
         self.task.addWidget(self.line, self.y_pos, 1)
@@ -160,12 +175,14 @@ class Window(QWidget):
         self.task.addWidget(self.button1, self.y_pos, 5)
         self.task.addWidget(self.button, self.y_pos, 6)
 
-        self.button2.clicked.connect(self.edit)
         self.button.clicked.connect(self.delete)
+        self.button2.clicked.connect(self.edit)
         self.button1.clicked.connect(self.save)
-
+        
         self.layouts[self.task] = self.elem
         self.layouts1[self.task] = self.button
+        self.layouts2[self.task] = self.button1
+        self.layouts3[self.task] = self.button2
 
         self.tasks.addLayout(self.task, self.y_pos, 0)
         
