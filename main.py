@@ -168,8 +168,9 @@ class Window(QWidget):
         self.label = QLabel(f"{self.y_pos}")
         self.line = QLineEdit()
         self.date = QDateTimeEdit()
-        self.date.setDisplayFormat = "MMM d yy"
+        self.date.setDisplayFormat("dd.MMM.yyyy hh:mm:ss")
         self.date1 = QDateTimeEdit()
+        self.date1.setDisplayFormat("dd.MMM.yyyy hh:mm:ss")
         self.text = QTextEdit()
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
