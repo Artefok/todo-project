@@ -13,27 +13,27 @@ class run:
         """
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
     def __enter__(self):
         self.con = sqlite3.connect("dbs/tasks.db")
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
         return (self.con, self.cur)
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
         if exc_val:
             raise
-    def create_a_task(self, date_exec, text_exec, date_until, time, name=None):
+    def create_a_task(self, date_exec, text_exec, date_until, name=None):
         """
         Creates a task.\n
         Создаёт напоминание.
         """
         if not name:
             name = "notnamed"
-        request = "INSERT INTO total_tasks(name, date, text, date_until, time) VALUES(?, ?, ?, ?, ?)"
-        self.cur.execute(request, (name, date_exec, text_exec, date_until, time))
+        request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
+        self.cur.execute(request, (name, date_exec, text_exec, date_until))
         self.con.commit()
     def delete_the_task(self, task_id):
         """
@@ -68,7 +68,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks"
         self.cur.execute(request)
-        self.con.commit()
+        # self.con.commit()
         return self.cur.fetchall()
     def clear(self):
         """
@@ -77,7 +77,7 @@ class run:
         """
         request = "DROP TABLE IF EXISTS total_tasks"
         self.cur.execute(request)
-        request = "CREATE TABLE total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time INT)"
+        request = "CREATE TABLE total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
     def con_exit(self):
         """
@@ -144,5 +144,6 @@ class run:
             name = "notnamed"
         request = "UPDATE total_tasks SET date_until=?, text=?, name=? time=? WHERE id=?"
         self.cur.execute(request, (date_until, text, name, time, task_id))
+    def commit(self):
         self.con.commit()
 __all__ = ["run", "sqlite3"]

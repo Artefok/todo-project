@@ -12,12 +12,11 @@ while True:
             print(f"ConsoleError: unknown command: '${act}'")
     #create a task  
     elif act == "1":
-        date = input("На какой день будет это напоминание?(желательно использовать формат ГГГГ-М-Д)\n")
-        date_until = input("До какого дня будет это напоминание?(желательно использовать формат ГГГГ-М-Д)\n")
+        date = input("На какой день будет это напоминание?(желательно использовать формат ГГГГ-ММ-ДД ЧЧ:ММ:СС)\n")
+        date_until = input("До какого дня будет это напоминание?(желательно использовать формат ГГГГ-М-Д ЧЧ:ММ:СС)\n")
         name = input("Название напоминания(не обязательно)\n")
         text = input("Текст напоминания\n")
-        time = input("Время напоминания\n")
-        con.create_a_task(date, text, date_until, time, name)
+        con.create_a_task(date, text, date_until, name)
     #show
     elif act == "2":
         act = input("Показать когда? Сегодня/На дату/Всё(С/НД/В)\n")
@@ -30,7 +29,7 @@ while True:
             con.reminder_on_date(date)
         #all
         elif act.upper() == "В":
-            con.reminder_all()
+            print(con.read_all())
         else:
             print("Ответ не корректен")
     #delete by id
