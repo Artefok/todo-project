@@ -6,7 +6,7 @@ import sqlite3
 from time import localtime
 from time import time
 class run:
-    def __init__(self, path, ctx=False):
+    def __init__(self, path="dbs/tasks.db"):
         """
         Connects to the database\n
         Подключается к базе данных
@@ -145,3 +145,4 @@ class run:
         request = "UPDATE total_tasks SET date_until=?, text=?, name=? time=? WHERE id=?"
         self.cur.execute(request, (date_until, text, name, time, task_id))
         self.con.commit()
+__all__ = ["run", "sqlite3"]

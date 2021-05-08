@@ -2,13 +2,12 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import sqlite3
+from reminders import *
   
 class Window(QWidget):
     def __init__(self):
         super().__init__()
-        self.con = sqlite3.connect("dbs/tasks.db")
-        self.cur = self.con.cursor()
+        self.db = run()
         self.setWindowTitle("To-Do")
         self.setWindowIcon(QIcon('web.png'))
         self.setGeometry(100, 50, 1920, 1080)
@@ -113,6 +112,7 @@ class Window(QWidget):
         self.val_list = list(self.layouts2.values())
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
+        self.db.create_a_task()
         
         self.layouts[self.item][1].setReadOnly(True)
         self.layouts[self.item][2].setReadOnly(True)
