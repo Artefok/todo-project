@@ -133,7 +133,7 @@ class Window(QWidget):
         self.val_list = list(self.layouts3.values())
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
-        self.db.delete_the_task(self.position)
+        self.db.delete_the_task(self.layouts[self.item][0].text())
         
         self.layouts[self.item][1].setReadOnly(False)
         self.layouts[self.item][2].setReadOnly(False)
@@ -141,7 +141,6 @@ class Window(QWidget):
         self.layouts[self.item][4].setReadOnly(False)
         self.layouts[self.item][6].setEnabled(True)
         self.layouts[self.item][7].setEnabled(False)
-        self.layouts[self.item][2].setDateTime(QDateTime.fromString("янв 7 2000", "MMM d yy"))
         
     def delete(self):
         self.widget = self.sender()
@@ -168,9 +167,9 @@ class Window(QWidget):
         self.label = QLabel(f"{self.y_pos}")
         self.line = QLineEdit()
         self.date = QDateTimeEdit()
-        self.date.setDisplayFormat("dd.MMM.yyyy hh:mm:ss")
+        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
         self.date1 = QDateTimeEdit()
-        self.date1.setDisplayFormat("dd.MMM.yyyy hh:mm:ss")
+        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
         self.text = QTextEdit()
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
@@ -218,15 +217,13 @@ class Window(QWidget):
         self.line.setReadOnly(True)
 
         self.date = QDateTimeEdit()
-        self.date.displayFormat = "MMM d yy"
-        print(date_exec)
-        self.date.setDateTime(QDateTime.fromString(date_exec, "MMM d yy"))
+        self.date.setDateTime(QDateTime.fromString(date_exec, "ddd MMM d hh:mm:ss yyyy"))
+        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
         self.date.setReadOnly(True)
 
         self.date1 = QDateTimeEdit()
-        self.date1.displayFormat = "MMM d yy"
-        print(date_until)
-        self.date1.setDateTime(QDateTime.fromString(date_until, "MMM d yy"))
+        self.date1.setDateTime(QDateTime.fromString(date_until, "ddd MMM d hh:mm:ss yyyy"))
+        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
         self.date1.setReadOnly(True)
 
 
