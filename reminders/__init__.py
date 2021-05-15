@@ -24,7 +24,7 @@ class run:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
         if exc_val:
-            raise
+            raise Exception
     def create_a_task(self, date_exec, text_exec, date_until, name=None):
         """
         Creates a task.\n
@@ -34,7 +34,7 @@ class run:
             name = "notnamed"
         request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
         self.cur.execute(request, (name, date_exec, text_exec, date_until))
-        self.con.commit()
+        self.commit()
     def delete_the_task(self, task_id):
         """
         Deletes the task. Requires task id\n
@@ -42,7 +42,7 @@ class run:
         """
         request = "DELETE FROM total_tasks WHERE id = ?"
         self.cur.execute(request, (task_id,))
-        self.con.commit()
+        self.commit()
     def read_one_id(self, task_id):
         """
         Reads the task. Requires task id\n
@@ -50,7 +50,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks WHERE id = ?"
         self.cur.execute(request, (task_id,))
-        self.con.commit()
+        self.commit()
         return self.cur.fetchall()
     def read_one_day(self, date):
         """
@@ -59,7 +59,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks WHERE date = ?"
         self.cur.execute(request, (date,))
-        self.con.commit()
+        self.commit()
         return self.cur.fetchall()
     def read_all(self):
         """
@@ -68,7 +68,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks"
         self.cur.execute(request)
-        # self.con.commit()
+        self.commit()
         return self.cur.fetchall()
     def clear(self):
         """
@@ -77,7 +77,7 @@ class run:
         """
         request = "DROP TABLE IF EXISTS total_tasks"
         self.cur.execute(request)
-        request = "CREATE TABLE total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
     def con_exit(self):
         """
@@ -144,6 +144,7 @@ class run:
             name = "notnamed"
         request = "UPDATE total_tasks SET date_until=?, text=?, name=? time=? WHERE id=?"
         self.cur.execute(request, (date_until, text, name, time, task_id))
+        self.commit()
     def commit(self):
         self.con.commit()
 __all__ = ["run", "sqlite3"]
