@@ -1,3 +1,3 @@
 # todo-project
-It's a Russian ToDo app!
-lol
+:white_check_mark: Working
+:negative_squared_cross_mark: Working stable
