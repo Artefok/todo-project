@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from reminders import *
+import datetime
 
 class Window(QWidget):
     def __init__(self):
@@ -118,8 +119,7 @@ class Window(QWidget):
         self.val_list = list(self.layouts2.values())
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
-        # self.db.create_a_task(self.layouts[self.item][2].dateTime().toString(), self.layouts[self.item][4].toPlainText(), self.layouts[self.item][3].dateTime().toString(),self.layouts[self.item][1].text() if self.layouts[self.item][1].text() else None, self.cur_id if self.cur_id else None)
-        self.db.update(self.layouts[self.item][2].dateTime().toString(), self.layouts[self.item][4].toPlainText(), self.layouts[self.item][3].dateTime().toString(), self.cur_id, self.layouts[self.item][1].text() if self.layouts[self.item][1].text() else None)
+        self.db.update(self.layouts[self.item][2].dateTime().toString("dd.MM.yyyy hh:mm:ss"), self.layouts[self.item][4].toPlainText(), self.layouts[self.item][3].dateTime().toString("dd.MM.yyyy hh:mm:ss"), self.cur_id, self.layouts[self.item][1].text() if self.layouts[self.item][1].text() else None)
 
         self.layouts[self.item][1].setReadOnly(True)
         self.layouts[self.item][2].setReadOnly(True)
@@ -175,8 +175,6 @@ class Window(QWidget):
                 break
         
         self.y_pos -= 1
-
-        
         
     def createTask(self):
         self.y_pos = self.y_pos + 1
@@ -187,9 +185,11 @@ class Window(QWidget):
         self.label = QLabel(f"{self.y_pos}")
         self.line = QLineEdit()
         self.date = QDateTimeEdit()
-        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
+        self.date.setDisplayFormat("dd.MM.yyyy hh:mm:ss")
+        self.date.setDateTime(QDateTime.fromString(datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S"), "dd.MM.yyyy hh:mm:ss"))
         self.date1 = QDateTimeEdit()
-        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
+        self.date1.setDisplayFormat("dd.MM.yyyy hh:mm:ss")
+        self.date1.setDateTime(QDateTime.fromString(datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S"), "dd.MM.yyyy hh:mm:ss"))
         self.text = QTextEdit()
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
@@ -237,13 +237,13 @@ class Window(QWidget):
         self.line.setReadOnly(True)
 
         self.date = QDateTimeEdit()
-        self.date.setDateTime(QDateTime.fromString(date_exec, "ddd MMM d hh:mm:ss yyyy"))
-        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
+        self.date.setDateTime(QDateTime.fromString(date_exec, "dd.MM.yyyy hh:mm:ss"))
+        self.date.setDisplayFormat("dd.MM.yyyy hh:mm:ss")
         self.date.setReadOnly(True)
 
         self.date1 = QDateTimeEdit()
-        self.date1.setDateTime(QDateTime.fromString(date_until, "ddd MMM d hh:mm:ss yyyy"))
-        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
+        self.date1.setDateTime(QDateTime.fromString(date_until, "dd.MM.yyyy hh:mm:ss"))
+        self.date1.setDisplayFormat("dd.MM.yyyy hh:mm:ss")
         self.date1.setReadOnly(True)
 
 
