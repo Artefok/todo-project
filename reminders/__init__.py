@@ -32,7 +32,7 @@ class run:
         """
         if not name:
             name = "notnamed"
-        if task_id:
+        if not task_id:
             request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
             self.cur.execute(request, (name, date_exec, text_exec, date_until))
         else:
