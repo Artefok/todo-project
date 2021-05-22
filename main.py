@@ -11,6 +11,7 @@ class Window(QWidget):
         self.setWindowTitle("To-Do")
         self.setWindowIcon(QIcon('web.png'))
         self.setGeometry(100, 50, 1920, 1080)
+        self.cur_id = None
 
         self.layout = QVBoxLayout(self)
         self.prelayout = QHBoxLayout(self)
@@ -117,7 +118,8 @@ class Window(QWidget):
         self.val_list = list(self.layouts2.values())
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
-        self.db.create_a_task(self.layouts[self.item][2].dateTime().toString(), self.layouts[self.item][4].toPlainText(), self.layouts[self.item][3].dateTime().toString(),self.layouts[self.item][1].text() if self.layouts[self.item][1].text() else None)
+        # self.db.create_a_task(self.layouts[self.item][2].dateTime().toString(), self.layouts[self.item][4].toPlainText(), self.layouts[self.item][3].dateTime().toString(),self.layouts[self.item][1].text() if self.layouts[self.item][1].text() else None, self.cur_id if self.cur_id else None)
+        self.db.update(self.layouts[self.item][2].dateTime().toString(), self.layouts[self.item][4].toPlainText(), self.layouts[self.item][3].dateTime().toString(), self.cur_id, self.layouts[self.item][1].text() if self.layouts[self.item][1].text() else None)
 
         self.layouts[self.item][1].setReadOnly(True)
         self.layouts[self.item][2].setReadOnly(True)
@@ -126,6 +128,15 @@ class Window(QWidget):
         self.layouts[self.item][5].setEnabled(True)
         self.layouts[self.item][6].setEnabled(False)
         self.layouts[self.item][7].setEnabled(True)
+        for i in self.layouts:
+            if i != self.item:
+                self.layouts[i][1].setReadOnly(True)
+                self.layouts[i][2].setReadOnly(True)
+                self.layouts[i][3].setReadOnly(True)
+                self.layouts[i][4].setReadOnly(True)
+                self.layouts[i][5].setEnabled(True)
+                self.layouts[i][6].setEnabled(False)
+                self.layouts[i][7].setEnabled(True)
 
     def edit(self):
         self.widget = self.sender()
@@ -133,14 +144,22 @@ class Window(QWidget):
         self.val_list = list(self.layouts3.values())
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
-        self.db.delete_the_task(self.layouts[self.item][0].text())
-        
+        self.cur_id = int(self.layouts[self.item][0].text())
         self.layouts[self.item][1].setReadOnly(False)
         self.layouts[self.item][2].setReadOnly(False)
         self.layouts[self.item][3].setReadOnly(False)
         self.layouts[self.item][4].setReadOnly(False)
         self.layouts[self.item][6].setEnabled(True)
         self.layouts[self.item][7].setEnabled(False)
+        for i in self.layouts:
+            if i != self.item:
+                self.layouts[i][1].setReadOnly(False)
+                self.layouts[i][2].setReadOnly(False)
+                self.layouts[i][3].setReadOnly(False)
+                self.layouts[i][4].setReadOnly(False)
+                self.layouts[i][6].setEnabled(False)
+                self.layouts[i][7].setEnabled(False)
+
         
     def delete(self):
         self.widget = self.sender()
@@ -162,6 +181,7 @@ class Window(QWidget):
     def createTask(self):
         self.y_pos = self.y_pos + 1
         self.elem = []
+        self.db.create_a_task(None, None, None, None, None)
 
         self.task = QGridLayout()
         self.label = QLabel(f"{self.y_pos}")

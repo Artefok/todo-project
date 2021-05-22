@@ -25,15 +25,19 @@ class run:
         self.con.close()
         if exc_val:
             raise Exception
-    def create_a_task(self, date_exec, text_exec, date_until, name=None):
+    def create_a_task(self, date_exec, text_exec, date_until, name=None, task_id=None):
         """
         Creates a task.\n
         Создаёт напоминание.
         """
         if not name:
             name = "notnamed"
-        request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
-        self.cur.execute(request, (name, date_exec, text_exec, date_until))
+        if task_id:
+            request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
+            self.cur.execute(request, (name, date_exec, text_exec, date_until))
+        else:
+             request = "INSERT INTO total_tasks(id, name, date, text, date_until) VALUES(?, ?, ?, ?, ?)"
+             self.cur.execute(request, (task_id, name, date_exec, text_exec, date_until))
         self.commit()
     def delete_the_task(self, task_id):
         """
@@ -135,15 +139,15 @@ class run:
                 print(f"id{i[0]} {i[1]} с {i[2]} до {i[4]}.{i[5]}: {i[3]}")
         except Exception as err:
             print(err)
-    def update(self, date_until, text, task_id, time, name=None):
+    def update(self, date_exec, text, date_until, task_id, name=None):
         """
         Updates reminder\n
         Обновление напоминания
         """
         if not name:
             name = "notnamed"
-        request = "UPDATE total_tasks SET date_until=?, text=?, name=? time=? WHERE id=?"
-        self.cur.execute(request, (date_until, text, name, time, task_id))
+        request = "UPDATE total_tasks SET date_until=?, text=?, date=?, name=? WHERE id=?"
+        self.cur.execute(request, (date_until, text, date_exec, name, task_id))
         self.commit()
     def commit(self):
         self.con.commit()
