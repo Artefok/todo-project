@@ -2,4 +2,4 @@
 
 :white_check_mark: Working
 
-:negative_squared_cross_mark: Working stable
+:white_check_mark: Stabilization working
