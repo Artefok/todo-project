@@ -33,10 +33,10 @@ class run:
         if not name:
             name = "notnamed"
         if not task_id:
-            request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
+            request = "INSERT or IGNORE INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
             self.cur.execute(request, (name, date_exec, text_exec, date_until))
         else:
-             request = "INSERT INTO total_tasks(id, name, date, text, date_until) VALUES(?, ?, ?, ?, ?)"
+             request = "INSERT or IGNORE INTO total_tasks(id, name, date, text, date_until) VALUES(?, ?, ?, ?, ?)"
              self.cur.execute(request, (task_id, name, date_exec, text_exec, date_until))
         self.commit()
     def delete_the_task(self, task_id):
@@ -152,7 +152,7 @@ class run:
                     date = "{date1}", 
                     text = "{text1}", 
                     date_until = "{date_until1}"
-                WHERE id = {task_id}
+                WHERE id = "{task_id}"
                 """
         print(request)
         self.cur.execute(request)
