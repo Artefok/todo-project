@@ -13,36 +13,40 @@ class run:
         """
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
     def __enter__(self):
         self.con = sqlite3.connect("dbs/tasks.db")
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
         return (self.con, self.cur)
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
         if exc_val:
-            raise
-    def create_a_task(self, date_exec, text_exec, date_until, time, name=None):
+            raise Exception
+    def create_a_task(self, date_exec, text_exec, date_until, name=None, task_id=None):
         """
         Creates a task.\n
         Создаёт напоминание.
         """
         if not name:
             name = "notnamed"
-        request = "INSERT INTO total_tasks(name, date, text, date_until, time) VALUES(?, ?, ?, ?, ?)"
-        self.cur.execute(request, (name, date_exec, text_exec, date_until, time))
-        self.con.commit()
+        if not task_id:
+            request = "INSERT INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
+            self.cur.execute(request, (name, date_exec, text_exec, date_until))
+        else:
+             request = "INSERT INTO total_tasks(id, name, date, text, date_until) VALUES(?, ?, ?, ?, ?)"
+             self.cur.execute(request, (task_id, name, date_exec, text_exec, date_until))
+        self.commit()
     def delete_the_task(self, task_id):
         """
         Deletes the task. Requires task id\n
         Удаляет напоминание. Требуется идентификатор напоминания.
         """
-        request = "DELETE FROM total_tasks WHERE id = ?"
-        self.cur.execute(request, (task_id,))
-        self.con.commit()
+        request = f"DELETE FROM total_tasks WHERE id = {task_id}"
+        self.cur.execute(request)
+        self.commit()
     def read_one_id(self, task_id):
         """
         Reads the task. Requires task id\n
@@ -50,7 +54,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks WHERE id = ?"
         self.cur.execute(request, (task_id,))
-        self.con.commit()
+        self.commit()
         return self.cur.fetchall()
     def read_one_day(self, date):
         """
@@ -59,7 +63,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks WHERE date = ?"
         self.cur.execute(request, (date,))
-        self.con.commit()
+        self.commit()
         return self.cur.fetchall()
     def read_all(self):
         """
@@ -68,7 +72,7 @@ class run:
         """
         request = "SELECT * FROM total_tasks"
         self.cur.execute(request)
-        self.con.commit()
+        self.commit()
         return self.cur.fetchall()
     def clear(self):
         """
@@ -77,7 +81,7 @@ class run:
         """
         request = "DROP TABLE IF EXISTS total_tasks"
         self.cur.execute(request)
-        request = "CREATE TABLE total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, time INT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
         self.cur.execute(request)
     def con_exit(self):
         """
@@ -135,14 +139,24 @@ class run:
                 print(f"id{i[0]} {i[1]} с {i[2]} до {i[4]}.{i[5]}: {i[3]}")
         except Exception as err:
             print(err)
-    def update(self, date_until, text, task_id, time, name=None):
+    def update(self, date1, text1, date_until1, task_id, name1=None):
         """
         Updates reminder\n
         Обновление напоминания
         """
-        if not name:
-            name = "notnamed"
-        request = "UPDATE total_tasks SET date_until=?, text=?, name=? time=? WHERE id=?"
-        self.cur.execute(request, (date_until, text, name, time, task_id))
+        if not name1:
+            name1 = "notnamed"
+        request = f"""
+                UPDATE total_tasks 
+                SET name = "{name1}", 
+                    date = "{date1}", 
+                    text = "{text1}", 
+                    date_until = "{date_until1}"
+                WHERE id = {task_id}
+                """
+        print(request)
+        self.cur.execute(request)
+        self.commit()
+    def commit(self):
         self.con.commit()
 __all__ = ["run", "sqlite3"]
