@@ -2,4 +2,4 @@
 
 :white_check_mark: Working
 
-:white_check_mark: Stabilization working
+:white_check_mark: Stable work
