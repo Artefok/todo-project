@@ -1,0 +1,13 @@
+# Database files
+/dbs/
+
+# Vscode settings
+/.vscode
+
+# Compilated files in reminders
+/reminders/__pycache__
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class

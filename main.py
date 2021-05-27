@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from reminders import *
 from datetime import date
+from plyer import notification
 
 class Window(QWidget):
     def __init__(self):
@@ -34,7 +35,10 @@ class Window(QWidget):
         self.layout.addWidget(self.plus)
         self.all = QPushButton("Все")
         self.active = QPushButton("Активные")
-        self.done = QPushButton("Сделанные")
+        self.done = QPushButton("Завершенные")
+        self.all.clicked.connect(self.all_tasks)
+        self.active.clicked.connect(self.active_tasks)
+        self.done.clicked.connect(self.done_tasks)
 
         self.prelayout.addWidget(self.all)
         self.prelayout.addWidget(self.active)
@@ -104,12 +108,16 @@ class Window(QWidget):
         self.layouts1 = {}
         self.layouts2 = {}
         self.layouts3 = {}
+        self.layouts4 = {}
+        self.done_layouts = {}
+        self.str_louts = {}
         self.x_pos = 0
         self.y_pos = 0
 
         for task in self.db.read_all():
-            self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4])
-            print(task)
+            self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+
+        self.day_notifications()
 
         self.show()
 
@@ -176,7 +184,6 @@ class Window(QWidget):
     def createTask(self):
         self.y_pos = self.y_pos + 1
         self.elem = []
-        self.db.create_a_task(None, None, None, None, self.y_pos)
 
         self.task = QGridLayout()
         self.label = QLabel(f"{self.y_pos}")
@@ -194,6 +201,7 @@ class Window(QWidget):
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
         self.button2 = QPushButton(f"Edit")
+        self.button3 = QPushButton(f"Done")
 
 
         self.elem.append(self.label)
@@ -204,6 +212,7 @@ class Window(QWidget):
         self.elem.append(self.button)
         self.elem.append(self.button1)
         self.elem.append(self.button2)
+        self.elem.append(self.button3)
 
         self.task.addWidget(self.label, self.y_pos, 0)
         self.task.addWidget(self.line, self.y_pos, 1)
@@ -213,24 +222,40 @@ class Window(QWidget):
         self.task.addWidget(self.button2, self.y_pos, 5)
         self.task.addWidget(self.button1, self.y_pos, 6)
         self.task.addWidget(self.button, self.y_pos, 7)
+        self.task.addWidget(self.button3, self.y_pos, 8)
 
         self.button.clicked.connect(self.delete)
         self.button2.clicked.connect(self.edit)
         self.button1.clicked.connect(self.save)
+        self.button3.clicked.connect(self.doneTask)
         
         self.layouts[self.task] = self.elem
         self.layouts1[self.task] = self.button
         self.layouts2[self.task] = self.button1
         self.layouts3[self.task] = self.button2
+        self.layouts4[self.task] = self.button3
+        self.str_louts[str(self.task)] = self.task
+
         self.button2.setEnabled(False)
         self.tasks.addLayout(self.task, self.y_pos, 0)
 
-    def createTaskWithStuff(self, id, name, date_exec, date_until, text):
+        self.db.create_a_task(None, None, None, "Active", self.task, None, self.y_pos)
+
+    def doneTask(self):
+        self.widget = self.sender()
+        self.widget.setEnabled(False)
+        self.key_list = list(self.layouts4.keys())
+        self.val_list = list(self.layouts4.values())
+        self.position = self.val_list.index(self.widget)
+        self.item = self.key_list[self.position]
+        self.db.done(int(self.layouts[self.item][0].text()))
+        
+        
+    def createTaskWithStuff(self, id, name, date_exec, date_until, text, status):
         self.y_pos += 1
         self.elem = []
 
         self.task = QGridLayout()
-        print(id)
         self.label = QLabel(f"{id}")
 
         self.line = QLineEdit()
@@ -247,7 +272,6 @@ class Window(QWidget):
         self.date1.setDisplayFormat("yyyy-MM-dd")
         self.date1.setReadOnly(True)
 
-
         self.text = QTextEdit()
         self.text.setText(text)
         self.text.setReadOnly(True)
@@ -255,9 +279,12 @@ class Window(QWidget):
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
         self.button2 = QPushButton(f"Edit")
+        self.button3 = QPushButton(f"Done")
 
-        
         self.button1.setEnabled(False)
+
+        if status == "Done":
+            self.button3.setEnabled(False)
 
         self.elem.append(self.label)
         self.elem.append(self.line)
@@ -267,6 +294,7 @@ class Window(QWidget):
         self.elem.append(self.button)
         self.elem.append(self.button1)
         self.elem.append(self.button2)
+        self.elem.append(self.button3)
 
         self.task.addWidget(self.label, id, 0)
         self.task.addWidget(self.line, id, 1)
@@ -276,19 +304,59 @@ class Window(QWidget):
         self.task.addWidget(self.button2, id, 5)
         self.task.addWidget(self.button1, id, 6)
         self.task.addWidget(self.button, id, 7)
+        self.task.addWidget(self.button3, id, 8)
 
         self.button.clicked.connect(self.delete)
         self.button2.clicked.connect(self.edit)
         self.button1.clicked.connect(self.save)
+        self.button3.clicked.connect(self.doneTask)
         
         self.layouts[self.task] = self.elem
         self.layouts1[self.task] = self.button
         self.layouts2[self.task] = self.button1
         self.layouts3[self.task] = self.button2
+        self.layouts4[self.task] = self.button3
+        self.str_louts[str(self.task)] = self.task
+
+        self.db.grid(int(self.layouts[self.task][0].text()), str(self.task))
 
         self.tasks.addLayout(self.task, id, 0)
-        
-          
+    def all_tasks(self):
+        for task in self.db.read_all():
+            self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+
+    def active_tasks(self):
+        for task in self.db.read_all():
+            if task[5] == "Active":
+                self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+            else:
+                for i in self.layouts:
+                    for p in self.layouts[i]:
+                        p.deleteLater()
+                    del self.layouts[i][0]
+                    
+            
+    def done_tasks(self):
+
+        for task in self.db.read_all():
+            if task[5] == "Done":
+                self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+            else:
+                for i in self.layouts[self.str_louts[task[6]]]:
+                    i.deleteLater()
+                del self.layouts[self.str_louts[task[6]]]
+    def day_notifications(self):
+        self.str_of_tasks = "Сегодня должны быть сделаны задачи: "
+        for task in self.db.read_all():
+            if task[4] == str(date.today()):
+                self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
+
+        self.str_of_tasks = self.str_of_tasks[:-2]
+        self.str_of_tasks = self.str_of_tasks + "."
+        notification.notify(
+            title="Напоминание", message=self.str_of_tasks, app_name="To-Do!", app_icon="web_notify.ico", timeout=10, ticker="", toast=False
+        )
+
 if __name__ == '__main__':
     App = QApplication(sys.argv)
     window = Window()

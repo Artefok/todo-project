@@ -13,19 +13,19 @@ class run:
         """
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT)"
         self.cur.execute(request)
     def __enter__(self):
         self.con = sqlite3.connect("dbs/tasks.db")
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT)"
         self.cur.execute(request)
         return (self.con, self.cur)
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.con.close()
         if exc_val:
             raise Exception
-    def create_a_task(self, date_exec, text_exec, date_until, name=None, task_id=None):
+    def create_a_task(self, date_exec, text_exec, date_until, status, grid, name=None, task_id=None):
         """
         Creates a task.\n
         Создаёт напоминание.
@@ -33,11 +33,11 @@ class run:
         if not name:
             name = "notnamed"
         if not task_id:
-            request = "INSERT or IGNORE INTO total_tasks(name, date, text, date_until) VALUES(?, ?, ?, ?)"
-            self.cur.execute(request, (name, date_exec, text_exec, date_until))
+            request = "INSERT INTO total_tasks(name, date, text, date_until, status, grid) VALUES(?, ?, ?, ?, ?, ?)"
+            self.cur.execute(request, (name, date_exec, text_exec, date_until, status, str(grid)))
         else:
-             request = "INSERT or IGNORE INTO total_tasks(id, name, date, text, date_until) VALUES(?, ?, ?, ?, ?)"
-             self.cur.execute(request, (task_id, name, date_exec, text_exec, date_until))
+             request = "INSERT INTO total_tasks(id, name, date, text, date_until, status, grid) VALUES(?, ?, ?, ?, ?, ?, ?)"
+             self.cur.execute(request, (task_id, name, date_exec, text_exec, date_until, status, str(grid)))
         self.commit()
     def delete_the_task(self, task_id):
         """
@@ -152,11 +152,29 @@ class run:
                     date = "{date1}", 
                     text = "{text1}", 
                     date_until = "{date_until1}"
-                WHERE id = "{task_id}"
+                WHERE id = {task_id}
                 """
         print(request)
         self.cur.execute(request)
         self.commit()
+    def done(self, task_id):
+
+        request = f"""
+        UPDATE total_tasks
+        SET status = "Done"
+        WHERE id = "{task_id}"
+        """
+        self.cur.execute(request)
+        self.commit()
+    def grid(self, task_id, grid):
+        request = f"""
+        UPDATE total_tasks
+        SET grid = "{grid}"
+        WHERE id = "{task_id}"
+        """
+        self.cur.execute(request)
+        self.commit()
+
     def commit(self):
         self.con.commit()
 __all__ = ["run", "sqlite3"]
