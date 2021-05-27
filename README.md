@@ -1,5 +1,14 @@
 # todo-project
 
-:white_check_mark: Working
+:heavy_check_mark: :
 
-:negative_squared_cross_mark: Working stable
+*  *Stable work*
+*  *Anti-spam*
+*  *Small size*
+*  *Without Internet*
+
+:x: :
+* *We haven't got sort of objects*
+* *Only Windows (OS)*
+* *Need a computer for work*
+* *Not stylish*
