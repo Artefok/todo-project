@@ -349,7 +349,8 @@ class Window(QWidget):
         self.str_of_tasks = "Сегодня должны быть сделаны задачи: "
         for task in self.db.read_all():
             if task[4] == str(date.today()):
-                self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
+                if task[5] == "Active":
+                    self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
 
         self.str_of_tasks = self.str_of_tasks[:-2]
         self.str_of_tasks = self.str_of_tasks + "."
