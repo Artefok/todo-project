@@ -153,7 +153,6 @@ class Window(QWidget):
         self.val_list = list(self.layouts3.values())
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
-        self.db.delete_the_task(self.layouts[self.item][0].text())
         
         self.layouts[self.item][1].setReadOnly(False)
         self.layouts[self.item][2].setReadOnly(False)
@@ -347,13 +346,18 @@ class Window(QWidget):
                 del self.layouts[self.str_louts[task[6]]]
     def day_notifications(self):
         self.str_of_tasks = "Сегодня должны быть сделаны задачи: "
+        self.tasks_num = 0
         for task in self.db.read_all():
+            print(task[4] == str(date.today()))
             if task[4] == str(date.today()):
-                if task[5] == "Active":
-                    self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
-
-        self.str_of_tasks = self.str_of_tasks[:-2]
-        self.str_of_tasks = self.str_of_tasks + "."
+                self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
+                self.tasks_num += 1
+        if self.tasks_num == 0:
+            self.str_of_tasks = "Сегодня никаких задач не запланировано."
+        elif self.tasks_num > 0:
+            self.str_of_tasks = self.str_of_tasks[:-2]
+            self.str_of_tasks = self.str_of_tasks + "."
+            
         notification.notify(
             title="Напоминание", message=self.str_of_tasks, app_name="To-Do!", app_icon="web_notify.ico", timeout=10, ticker="", toast=False
         )

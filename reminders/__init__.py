@@ -81,7 +81,7 @@ class run:
         """
         request = "DROP TABLE IF EXISTS total_tasks"
         self.cur.execute(request)
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT, grid TEXT)"
         self.cur.execute(request)
     def con_exit(self):
         """
