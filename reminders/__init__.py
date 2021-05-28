@@ -13,12 +13,12 @@ class run:
         """
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT, grid TEXT)"
         self.cur.execute(request)
     def __enter__(self):
         self.con = sqlite3.connect("dbs/tasks.db")
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT, grid TEXT)"
         self.cur.execute(request)
         return (self.con, self.cur)
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -81,7 +81,7 @@ class run:
         """
         request = "DROP TABLE IF EXISTS total_tasks"
         self.cur.execute(request)
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, status TEXT, grid TEXT)"
         self.cur.execute(request)
     def con_exit(self):
         """

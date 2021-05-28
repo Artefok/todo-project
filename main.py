@@ -128,9 +128,9 @@ class Window(QWidget):
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
         self.cur_id = int(self.layouts[self.item][0].text())
-        self.date = self.layouts[self.item][2].date().toString('ddd MMM d hh:mm:ss yyyy')
+        self.date = self.layouts[self.item][2].date().toString('yyyy-MM-dd')
         self.text = str(self.layouts[self.item][4].toPlainText())
-        self.date1 = self.layouts[self.item][3].date().toString('ddd MMM d hh:mm:ss yyyy')
+        self.date1 = self.layouts[self.item][3].date().toString('yyyy-MM-dd')
         self.name = str(self.layouts[self.item][1].text())
         print(self.date)
         print(self.text)
@@ -189,13 +189,12 @@ class Window(QWidget):
         self.line = QLineEdit()
 
         self.date = QDateTimeEdit()
-        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
-        self.date.setReadOnly(True)
+        self.date.setDisplayFormat("yyyy-MM-dd")
+        self.date.setDate(date.today())
 
         self.date1 = QDateTimeEdit()
-        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
-        self.date1.setReadOnly(True)
-
+        self.date1.setDisplayFormat("yyyy-MM-dd")
+        self.date1.setDate(date.today())
 
         self.text = QTextEdit()
         self.button = QPushButton(f"Delete")
@@ -263,13 +262,13 @@ class Window(QWidget):
         self.line.setReadOnly(True)
 
         self.date = QDateEdit()
-        self.date.setDate(QDate.fromString(date_exec, "ddd MMM d hh:mm:ss yyyy"))
-        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
+        self.date.setDate(QDate.fromString(date_exec, "yyyy-MM-dd"))
+        self.date.setDisplayFormat("yyyy-MM-dd")
         self.date.setReadOnly(True)
 
         self.date1 = QDateEdit()
-        self.date1.setDate(QDate.fromString(date_until, "ddd MMM d hh:mm:ss yyyy"))
-        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
+        self.date1.setDate(QDate.fromString(date_until, "yyyy-MM-dd"))
+        self.date1.setDisplayFormat("yyyy-MM-dd")
         self.date1.setReadOnly(True)
 
         self.text = QTextEdit()
