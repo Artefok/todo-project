@@ -235,13 +235,13 @@ class Window(QWidget):
         self.line.setReadOnly(True)
 
         self.date = QDateTimeEdit()
-        self.date.setDateTime(QDateTime.fromString(date_exec, "dd.MM.yyyy hh:mm:ss"))
-        self.date.setDisplayFormat("dd.MM.yyyy hh:mm:ss")
+        self.date.setDateTime(QDateTime.fromString(date_exec, "ddd MMM d hh:mm:ss yyyy"))
+        self.date.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
         self.date.setReadOnly(True)
 
         self.date1 = QDateTimeEdit()
-        self.date1.setDateTime(QDateTime.fromString(date_until, "dd.MM.yyyy hh:mm:ss"))
-        self.date1.setDisplayFormat("dd.MM.yyyy hh:mm:ss")
+        self.date1.setDateTime(QDateTime.fromString(date_until, "ddd MMM d hh:mm:ss yyyy"))
+        self.date1.setDisplayFormat("ddd MMM d hh:mm:ss yyyy")
         self.date1.setReadOnly(True)
 
 

@@ -3,8 +3,6 @@ This module implements reminder system\
 Этот модуль реализовывает систему напоминаний.
 """
 import sqlite3
-from time import localtime
-from time import time
 class run:
     def __init__(self, path="dbs/tasks.db"):
         """
@@ -13,12 +11,12 @@ class run:
         """
         self.con = sqlite3.connect(path)
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, task_id INTEGER)"
         self.cur.execute(request)
     def __enter__(self):
         self.con = sqlite3.connect("dbs/tasks.db")
         self.cur = self.con.cursor()
-        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
+        request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT, task_id INTEGER)"
         self.cur.execute(request)
         return (self.con, self.cur)
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -43,6 +41,7 @@ class run:
         request = "DELETE FROM total_tasks WHERE id = ?"
         self.cur.execute(request, (task_id,))
         self.commit()
+    # region
     # def read_one_id(self, task_id):
     #     """
     #     Reads the task. Requires task id\n
@@ -61,6 +60,7 @@ class run:
     #     self.cur.execute(request, (date,))
     #     self.commit()
     #     return self.cur.fetchall()
+    #endregion
     def read_all(self):
         """
         Reads all tasks\n
@@ -70,6 +70,7 @@ class run:
         self.cur.execute(request)
         self.commit()
         return self.cur.fetchall()
+    # region
     # def clear(self):
     #     """
     #     Clears everything\n
@@ -79,12 +80,14 @@ class run:
     #     self.cur.execute(request)
     #     request = "CREATE TABLE IF NOT EXISTS total_tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, date TEXT, text TEXT, date_until TEXT)"
     #     self.cur.execute(request)
+    #endregion
     def con_exit(self):
         """
         Closes the connection\n
         Закрывает соединение.
         """
         self.con.close()
+    # region
     # def show_on_date(self, date):
     #     """
     #     Returns every reminder on date\n
@@ -135,6 +138,7 @@ class run:
     #             print(f"id{i[0]} {i[1]} с {i[2]} до {i[4]}.{i[5]}: {i[3]}")
     #     except Exception as err:
     #         print(err)
+    #endregion
     def update(self, date_until, text, task_id, date_exec, display_id, name=None):
         """
         Updates reminder\n
