@@ -8,6 +8,7 @@
 *  *Without Internet*
 
 :x: :
+* *We haven't got sort of objects*
 * *Only Windows (OS)*
 * *Notification system works not stable*
 * *Need a computer for work*

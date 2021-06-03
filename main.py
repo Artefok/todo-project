@@ -1,10 +1,9 @@
 import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QWidget, QGridLayout, QDateTimeEdit, QLineEdit, QTextEdit, QDateEdit, QMessageBox, QApplication
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QDate
 from reminders import *
 from datetime import date
-from plyer import notification
 
 class Window(QWidget):
     def __init__(self):
@@ -17,25 +16,27 @@ class Window(QWidget):
         self.layout = QVBoxLayout(self)
         self.prelayout = QHBoxLayout(self)
 
-        self.grid = QGridLayout(self)
-
         self.row = 0
         #===================
         #widget part
         #-------------------
         
         self.label = QLabel('To-Do!', self)
-        
         self.plus = QPushButton("+", self)
-        self.plus.resize(700, 30)
+        self.plus.resize(700, 100)
         self.plus.clicked.connect(self.createTask)
+
+        self.today = QPushButton("Tasks on today")
+        self.today.resize(500, 30)
+        self.today.clicked.connect(self.day_notifications)
         
 ##        self.grid.addWidget(self.plus, 0, 2, 3, 2)
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.plus)
-        self.all = QPushButton("Все")
-        self.active = QPushButton("Активные")
-        self.done = QPushButton("Завершенные")
+        self.layout.addWidget(self.today)
+        self.all = QPushButton("All")
+        self.active = QPushButton("Active")
+        self.done = QPushButton("Done")
         self.all.clicked.connect(self.all_tasks)
         self.active.clicked.connect(self.active_tasks)
         self.done.clicked.connect(self.done_tasks)
@@ -85,9 +86,6 @@ class Window(QWidget):
                                   QPushButton:hover{
                                       background-color: lightgray;
                                   }
-                                  QPushButton:pressed{
-                                      box-shadow: 5px 10px 8px;
-                                  }
                                 """)
         
         self.done.setStyleSheet("""QPushButton{
@@ -117,9 +115,8 @@ class Window(QWidget):
         for task in self.db.read_all():
             self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
 
-        self.day_notifications()
-
         self.show()
+
 
     def save(self):
         self.widget = self.sender()
@@ -174,7 +171,6 @@ class Window(QWidget):
             if self.layouts[self.item] == None:
                 break
         del self.layouts[self.item]
-        print(self.layouts)
         
         self.y_pos -= 1
 
@@ -345,22 +341,19 @@ class Window(QWidget):
                     i.deleteLater()
                 del self.layouts[self.str_louts[task[6]]]
     def day_notifications(self):
-        self.str_of_tasks = "Сегодня должны быть сделаны задачи: "
+        self.str_of_tasks = "Today, you need to do these tasks - "
         self.tasks_num = 0
         for task in self.db.read_all():
-            print(task[4] == str(date.today()))
-            if task[4] == str(date.today()):
+            if task[4] == str(date.today()) or task[2] == str(date.today()):
                 self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
                 self.tasks_num += 1
         if self.tasks_num == 0:
-            self.str_of_tasks = "Сегодня никаких задач не запланировано."
+            self.str_of_tasks = "You're relaxing today! You don't need to do anything today."
         elif self.tasks_num > 0:
             self.str_of_tasks = self.str_of_tasks[:-2]
             self.str_of_tasks = self.str_of_tasks + "."
             
-        notification.notify(
-            title="Напоминание", message=self.str_of_tasks, app_name="To-Do!", app_icon="web_notify.ico", timeout=10, ticker="", toast=False
-        )
+        QMessageBox.about(self, 'Tasks', self.str_of_tasks)
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
