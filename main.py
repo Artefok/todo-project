@@ -113,7 +113,10 @@ class Window(QWidget):
         self.y_pos = 0
 
         for task in self.db.read_all():
-            self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+            if task[1] != 'notnamed':
+                self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+            else:
+                self.db.delete_the_task(task[0])
 
         self.show()
 
@@ -317,6 +320,7 @@ class Window(QWidget):
 
         self.tasks.addLayout(self.task, id, 0)
     def all_tasks(self):
+        self.y_pos = 0
         for task in self.db.read_all():
             self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
 
@@ -329,6 +333,7 @@ class Window(QWidget):
                     for p in self.layouts[i]:
                         p.deleteLater()
                     del self.layouts[i][0]
+                    self.y_pos -= 1
                     
             
     def done_tasks(self):
@@ -340,6 +345,7 @@ class Window(QWidget):
                 for i in self.layouts[self.str_louts[task[6]]]:
                     i.deleteLater()
                 del self.layouts[self.str_louts[task[6]]]
+                self.y_pos -= 1
     def day_notifications(self):
         self.str_of_tasks = "Today, you need to do these tasks - "
         self.tasks_num = 0
