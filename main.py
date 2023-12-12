@@ -327,11 +327,8 @@ class Window(QWidget):
                     i.deleteLater()
                 del self.layouts[self.str_louts[task[6]]]
                 self.y_pos -= 1
-<<<<<<< HEAD
 
-    #
-=======
->>>>>>> c11940d2287345d3905ebccfa5dee5c24397c8c0
+    # Отображение задач на сегодня
     def day_notifications(self):
         self.str_of_tasks = "Сегодня тебе нужно сделать данные задачи - "
         self.tasks_num = 0
