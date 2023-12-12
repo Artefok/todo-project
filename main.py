@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QScrollArea, QWidget, QGridLayout, QDateTimeEdit, QLineEdit, QTextEdit, QDateEdit, QMessageBox, QApplication
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFontDatabase
 from PyQt5.QtCore import QDate
 from reminders import *
 from datetime import date
@@ -17,6 +17,7 @@ class Window(QWidget):
         self.prelayout = QHBoxLayout(self)
 
         self.row = 0
+        
         #===================
         #widget part
         #-------------------
@@ -63,6 +64,8 @@ class Window(QWidget):
         #===================
         #CSS part
         #--------------------
+        self.setStyleSheet('''background-color: #4f4f4f;
+                              color: #b0b0b0;''')
         self.label.setStyleSheet("""font-size: 14.5pt;
                                     font-family: MS Gothic 2;
                                     """)
@@ -73,7 +76,8 @@ class Window(QWidget):
                                       border: 1px solid gray;
                                   }
                                   QPushButton:hover{
-                                      background-color: lightgray;
+                                      background-color: #474747;
+                                      height: 20px;
                                   }
                                 """)
         
@@ -84,7 +88,7 @@ class Window(QWidget):
                                       border: 1px solid gray;
                                   }
                                   QPushButton:hover{
-                                      background-color: lightgray;
+                                      background-color: #474747;
                                   }
                                 """)
         
@@ -95,7 +99,7 @@ class Window(QWidget):
                                       border: 1px solid gray;
                                   }
                                   QPushButton:hover{
-                                      background-color: lightgray;
+                                      background-color: #474747;
                                   }
                                 """)
         
@@ -113,26 +117,33 @@ class Window(QWidget):
         self.y_pos = 0
 
         for task in self.db.read_all():
-            self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+            if task[1] != 'notnamed':
+                self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
+            else:
+                self.db.delete_the_task(task[0])
 
         self.show()
 
+    def task_access(self, enable, disable):
+        for i in enable:
+            self.layouts[self.item][i].setReadOnly(True)
+        for j in disable:
+            self.layouts[self.item][i].setReadOnly(False)
 
     def save(self):
         self.widget = self.sender()
-        self.key_list = list(self.layouts2.keys())
+
+        self.key_list = list(self.layouts2.keys()) 
         self.val_list = list(self.layouts2.values())
+
         self.position = self.val_list.index(self.widget)
         self.item = self.key_list[self.position]
+
         self.cur_id = int(self.layouts[self.item][0].text())
         self.date = self.layouts[self.item][2].date().toString('yyyy-MM-dd')
         self.text = str(self.layouts[self.item][4].toPlainText())
         self.date1 = self.layouts[self.item][3].date().toString('yyyy-MM-dd')
         self.name = str(self.layouts[self.item][1].text())
-        print(self.date)
-        print(self.text)
-        print(self.date1)
-        print(self.name)
 
         self.db.update(self.date, self.text, self.date1, self.cur_id, self.name  if self.name else None)
 
@@ -175,7 +186,7 @@ class Window(QWidget):
         self.y_pos -= 1
 
         
-        
+    # создание и отображение новой задачи    
     def createTask(self):
         self.y_pos = self.y_pos + 1
         self.elem = []
@@ -183,6 +194,7 @@ class Window(QWidget):
         self.task = QGridLayout()
         self.label = QLabel(f"{self.y_pos}")
         self.line = QLineEdit()
+        self.line.setStyleSheet("background: #474747;")
 
         self.date = QDateTimeEdit()
         self.date.setDisplayFormat("yyyy-MM-dd")
@@ -193,50 +205,39 @@ class Window(QWidget):
         self.date1.setDate(date.today())
 
         self.text = QTextEdit()
-        self.button = QPushButton(f"Delete")
-        self.button1 = QPushButton(f"Save")
-        self.button2 = QPushButton(f"Edit")
-        self.button3 = QPushButton(f"Done")
+        self.text.setStyleSheet("background: #474747;")
 
+        # кнопки редактирования задачи
+        self.btnDelete = QPushButton(f"Delete") 
+        self.btnSave = QPushButton(f"Save")
+        self.btnEdit = QPushButton(f"Edit")
+        self.btnDone = QPushButton(f"Done")
 
-        self.elem.append(self.label)
-        self.elem.append(self.line)
-        self.elem.append(self.date)
-        self.elem.append(self.date1)
-        self.elem.append(self.text)
-        self.elem.append(self.button)
-        self.elem.append(self.button1)
-        self.elem.append(self.button2)
-        self.elem.append(self.button3)
+        task_line = [self.label, self.line, self.date, self.date1, self.text, self.btnDelete, self.btnSave, self.btnEdit, self.btnDone] # все элементы задачи
 
-        self.task.addWidget(self.label, self.y_pos, 0)
-        self.task.addWidget(self.line, self.y_pos, 1)
-        self.task.addWidget(self.date, self.y_pos, 2)
-        self.task.addWidget(self.date1, self.y_pos, 3)
-        self.task.addWidget(self.text, self.y_pos, 4)
-        self.task.addWidget(self.button2, self.y_pos, 5)
-        self.task.addWidget(self.button1, self.y_pos, 6)
-        self.task.addWidget(self.button, self.y_pos, 7)
-        self.task.addWidget(self.button3, self.y_pos, 8)
+        for i in range(len(task_line)+1):
+            self.elem.append(task_line[i])
+            self.task.addWidget(task_line[i], self.y_pos, i)
 
-        self.button.clicked.connect(self.delete)
-        self.button2.clicked.connect(self.edit)
-        self.button1.clicked.connect(self.save)
-        self.button3.clicked.connect(self.doneTask)
+        self.btnDelete.clicked.connect(self.delete) # функции, прикрепляемые к кнопкам редактирования задач
+        self.btnEdit.clicked.connect(self.edit)
+        self.btnSave.clicked.connect(self.save)
+        self.btnDone.clicked.connect(self.doneTask)
         
-        self.layouts[self.task] = self.elem
-        self.layouts1[self.task] = self.button
-        self.layouts2[self.task] = self.button1
-        self.layouts3[self.task] = self.button2
-        self.layouts4[self.task] = self.button3
+        self.layouts[self.task] = self.elem # заполнение layout-ов нужными элементами
+        self.layouts1[self.task] = task_line[5]
+        self.layouts2[self.task] = task_line[6]
+        self.layouts3[self.task] = task_line[7]
+        self.layouts4[self.task] = task_line[8]
         self.str_louts[str(self.task)] = self.task
 
-        self.button2.setEnabled(False)
-        self.tasks.addLayout(self.task, self.y_pos, 0)
+        self.btnEdit.setEnabled(False) # доп. настройки для задачи
+        self.tasks.addLayout(self.task, self.y_pos, 0) # визуальный показ layout-а
 
-        self.db.create_a_task(None, None, None, "Active", self.task, None, self.y_pos)
+        self.db.create_a_task(None, None, None, "Active", self.task, None, self.y_pos) # создание записи в БД
 
-    def doneTask(self):
+    # Смена статуса задачи на "Done" (сделано)
+    def doneTask(self): 
         self.widget = self.sender()
         self.widget.setEnabled(False)
         self.key_list = list(self.layouts4.keys())
@@ -245,7 +246,7 @@ class Window(QWidget):
         self.item = self.key_list[self.position]
         self.db.done(int(self.layouts[self.item][0].text()))
         
-        
+    # отображение ранее созданной задачи из БД
     def createTaskWithStuff(self, id, name, date_exec, date_until, text, status):
         self.y_pos += 1
         self.elem = []
@@ -256,6 +257,7 @@ class Window(QWidget):
         self.line = QLineEdit()
         self.line.setText(name)
         self.line.setReadOnly(True)
+        self.line.setStyleSheet("background: #474747;")
 
         self.date = QDateEdit()
         self.date.setDate(QDate.fromString(date_exec, "yyyy-MM-dd"))
@@ -270,6 +272,7 @@ class Window(QWidget):
         self.text = QTextEdit()
         self.text.setText(text)
         self.text.setReadOnly(True)
+        self.text.setStyleSheet("background: #474747;")
 
         self.button = QPushButton(f"Delete")
         self.button1 = QPushButton(f"Save")
@@ -281,45 +284,38 @@ class Window(QWidget):
         if status == "Done":
             self.button3.setEnabled(False)
 
-        self.elem.append(self.label)
-        self.elem.append(self.line)
-        self.elem.append(self.date)
-        self.elem.append(self.date1)
-        self.elem.append(self.text)
-        self.elem.append(self.button)
-        self.elem.append(self.button1)
-        self.elem.append(self.button2)
-        self.elem.append(self.button3)
+        task_line = [self.label, self.line, self.date, self.date1, self.text, self.btnDelete, self.btnSave, self.btnEdit, self.btnDone] # все элементы задачи
 
-        self.task.addWidget(self.label, id, 0)
-        self.task.addWidget(self.line, id, 1)
-        self.task.addWidget(self.date, id, 2)
-        self.task.addWidget(self.date1, id, 3)
-        self.task.addWidget(self.text, id, 4)
-        self.task.addWidget(self.button2, id, 5)
-        self.task.addWidget(self.button1, id, 6)
-        self.task.addWidget(self.button, id, 7)
-        self.task.addWidget(self.button3, id, 8)
+        for i in range(len(task_line)+1):
+            self.elem.append(task_line[i])
+            self.task.addWidget(task_line[i], self.y_pos, i)
 
-        self.button.clicked.connect(self.delete)
-        self.button2.clicked.connect(self.edit)
-        self.button1.clicked.connect(self.save)
-        self.button3.clicked.connect(self.doneTask)
+        self.btnDelete.clicked.connect(self.delete) # функции, прикрепляемые к кнопкам редактирования задач
+        self.btnEdit.clicked.connect(self.edit)
+        self.btnSave.clicked.connect(self.save)
+        self.btnDone.clicked.connect(self.doneTask)
         
-        self.layouts[self.task] = self.elem
-        self.layouts1[self.task] = self.button
-        self.layouts2[self.task] = self.button1
-        self.layouts3[self.task] = self.button2
-        self.layouts4[self.task] = self.button3
+        self.layouts[self.task] = self.elem # заполнение layout-ов нужными элементами
+        self.layouts1[self.task] = task_line[5]
+        self.layouts2[self.task] = task_line[6]
+        self.layouts3[self.task] = task_line[7]
+        self.layouts4[self.task] = task_line[8]
         self.str_louts[str(self.task)] = self.task
 
         self.db.grid(int(self.layouts[self.task][0].text()), str(self.task))
 
         self.tasks.addLayout(self.task, id, 0)
+
+
+    # СОРТИРОВКА
+    
+    # Отображение всех задач
     def all_tasks(self):
+        self.y_pos = 0
         for task in self.db.read_all():
             self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
-
+    
+    # Отображение активных задач
     def active_tasks(self):
         for task in self.db.read_all():
             if task[5] == "Active":
@@ -329,10 +325,11 @@ class Window(QWidget):
                     for p in self.layouts[i]:
                         p.deleteLater()
                     del self.layouts[i][0]
+                    self.y_pos -= 1
                     
-            
+    
+    # Отображение сделанных задач
     def done_tasks(self):
-
         for task in self.db.read_all():
             if task[5] == "Done":
                 self.createTaskWithStuff(id=task[0], name=task[1], date_exec=task[2], text=task[3], date_until=task[4], status=task[5])
@@ -340,15 +337,18 @@ class Window(QWidget):
                 for i in self.layouts[self.str_louts[task[6]]]:
                     i.deleteLater()
                 del self.layouts[self.str_louts[task[6]]]
+                self.y_pos -= 1
+
+    # Отображение задач на сегодня
     def day_notifications(self):
-        self.str_of_tasks = "Today, you need to do these tasks - "
+        self.str_of_tasks = "Сегодня тебе нужно сделать данные задачи - "
         self.tasks_num = 0
         for task in self.db.read_all():
             if task[4] == str(date.today()) or task[2] == str(date.today()):
                 self.str_of_tasks = self.str_of_tasks + str(task[1]) + ", "
                 self.tasks_num += 1
         if self.tasks_num == 0:
-            self.str_of_tasks = "You're relaxing today! You don't need to do anything today."
+            self.str_of_tasks = "На сегодня ничего не было запланировано"
         elif self.tasks_num > 0:
             self.str_of_tasks = self.str_of_tasks[:-2]
             self.str_of_tasks = self.str_of_tasks + "."
@@ -357,6 +357,10 @@ class Window(QWidget):
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
+    id = QFontDatabase.addApplicationFont("C:\\Users\\Artefok\\Desktop\\OpenSans-Regular.ttf")
+        # Если id равен -1, то шрифт не установлен
+    if id == -1:
+        print('Шрифт somefont не установлен')   
     window = Window()
     App.setStyle('Fusion')
     sys.exit(App.exec())
