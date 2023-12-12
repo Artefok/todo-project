@@ -215,7 +215,7 @@ class Window(QWidget):
 
         task_line = [self.label, self.line, self.date, self.date1, self.text, self.btnDelete, self.btnSave, self.btnEdit, self.btnDone] # все элементы задачи
 
-        for i in range(len(task_line)+1):
+        for i in range(len(task_line)):
             self.elem.append(task_line[i])
             self.task.addWidget(task_line[i], self.y_pos, i)
 
@@ -274,19 +274,19 @@ class Window(QWidget):
         self.text.setReadOnly(True)
         self.text.setStyleSheet("background: #474747;")
 
-        self.button = QPushButton(f"Delete")
-        self.button1 = QPushButton(f"Save")
-        self.button2 = QPushButton(f"Edit")
-        self.button3 = QPushButton(f"Done")
+        self.btnDelete = QPushButton(f"Delete")
+        self.btnSave = QPushButton(f"Save")
+        self.btnEdit = QPushButton(f"Edit")
+        self.btnDone = QPushButton(f"Done")
 
-        self.button1.setEnabled(False)
+        self.btnSave.setEnabled(False)
 
         if status == "Done":
-            self.button3.setEnabled(False)
+            self.btnDone.setEnabled(False)
 
         task_line = [self.label, self.line, self.date, self.date1, self.text, self.btnDelete, self.btnSave, self.btnEdit, self.btnDone] # все элементы задачи
 
-        for i in range(len(task_line)+1):
+        for i in range(len(task_line)):
             self.elem.append(task_line[i])
             self.task.addWidget(task_line[i], self.y_pos, i)
 
