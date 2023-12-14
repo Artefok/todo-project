@@ -54,8 +54,8 @@ bdist_dmg_options = {
 
 setup(
     name="todo",
-    version="0.1",
-    description="Sample cx_Freeze PyQt5 script",
+    version="1.0.4",
+    description="Cx_Freeze PyQt5 script",
     options={
         "build_exe": build_exe_options,
         "bdist_mac": bdist_mac_options,
